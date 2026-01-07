@@ -108,6 +108,12 @@ class Player {
       ctx.moveTo(playerCenterX, playerCenterY);
       ctx.lineTo(touchX, touchY);
       ctx.stroke();
+
+      // 绘制触摸点指示器
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.beginPath();
+      ctx.arc(touchX, touchY, 10, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
@@ -118,32 +124,20 @@ class Player {
     if (keys.w && this.y > 0) this.y -= this.speed;
     if (keys.s && this.y < canvas.height - this.height) this.y += this.speed;
 
-    // 触摸移动控制
+    // 触摸移动控制 - 直接移动到触摸位置
     if (isTouching && player) {
       // 获取触摸相对于画布的位置
       const rect = canvas.getBoundingClientRect();
       const touchX = touchStartX - rect.left;
       const touchY = touchStartY - rect.top;
 
-      // 计算玩家中心位置
-      const playerCenterX = this.x + this.width / 2;
-      const playerCenterY = this.y + this.height / 2;
+      // 计算玩家应处的位置（使飞机中心对齐触摸点）
+      this.x = touchX - this.width / 2;
+      this.y = touchY - this.height / 2;
 
-      // 计算向量差
-      const dx = touchX - playerCenterX;
-      const dy = touchY - playerCenterY;
-
-      // 归一化并应用速度
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance > 5) { // 避免微小的触摸抖动
-        const speedFactor = Math.min(this.speed, distance) / distance;
-        this.x += dx * speedFactor;
-        this.y += dy * speedFactor;
-
-        // 边界检查
-        this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
-        this.y = Math.max(0, Math.min(canvas.height - this.height, this.y));
-      }
+      // 边界检查
+      this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
+      this.y = Math.max(0, Math.min(canvas.height - this.height, this.y));
     }
   }
 }
@@ -568,11 +562,10 @@ function handleTouchStart(e) {
 // 触摸移动事件
 function handleTouchMove(e) {
   e.preventDefault();
-  if (isTouching) {
-    const touch = e.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-  }
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  // 不需要设置isTouching=true，因为它已经在触摸中
 }
 
 // 触摸结束事件
