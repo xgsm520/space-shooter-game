@@ -30,6 +30,11 @@ const keys = {
   d: false
 };
 
+// 触摸控制状态
+let touchStartX = 0;
+let touchStartY = 0;
+let isTouching = false;
+
 // 游戏元素类
 class Player {
   constructor() {
@@ -71,7 +76,7 @@ class Player {
     ctx.fill();
 
     // 绘制引擎火焰
-    if (keys.w || keys.a || keys.s || keys.d) {
+    if (keys.w || keys.a || keys.s || keys.d || isTouching) {
       ctx.fillStyle = '#ff9800';
       ctx.beginPath();
       ctx.moveTo(this.x + this.width / 2 - 5, this.y + this.height);
@@ -80,14 +85,66 @@ class Player {
       ctx.closePath();
       ctx.fill();
     }
+
+    // 如果是触摸模式且正在触摸，则绘制触摸目标指示器
+    if (isTouching) {
+      const rect = canvas.getBoundingClientRect();
+      const touchX = touchStartX - rect.left;
+      const touchY = touchStartY - rect.top;
+
+      // 绘制目标圆圈
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(touchX, touchY, 20, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 绘制连接线
+      const playerCenterX = this.x + this.width / 2;
+      const playerCenterY = this.y + this.height / 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(playerCenterX, playerCenterY);
+      ctx.lineTo(touchX, touchY);
+      ctx.stroke();
+    }
   }
 
   update() {
-    // 移动控制
+    // 键盘移动控制
     if (keys.a && this.x > 0) this.x -= this.speed;
     if (keys.d && this.x < canvas.width - this.width) this.x += this.speed;
     if (keys.w && this.y > 0) this.y -= this.speed;
     if (keys.s && this.y < canvas.height - this.height) this.y += this.speed;
+
+    // 触摸移动控制
+    if (isTouching && player) {
+      // 获取触摸相对于画布的位置
+      const rect = canvas.getBoundingClientRect();
+      const touchX = touchStartX - rect.left;
+      const touchY = touchStartY - rect.top;
+
+      // 计算玩家中心位置
+      const playerCenterX = this.x + this.width / 2;
+      const playerCenterY = this.y + this.height / 2;
+
+      // 计算向量差
+      const dx = touchX - playerCenterX;
+      const dy = touchY - playerCenterY;
+
+      // 归一化并应用速度
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > 5) { // 避免微小的触摸抖动
+        const speedFactor = Math.min(this.speed, distance) / distance;
+        this.x += dx * speedFactor;
+        this.y += dy * speedFactor;
+
+        // 边界检查
+        this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
+        this.y = Math.max(0, Math.min(canvas.height - this.height, this.y));
+      }
+    }
   }
 }
 
@@ -476,6 +533,19 @@ function bindEventListeners() {
     if (e.key === 'd' || e.key === 'D') keys.d = false;
   });
 
+  // 触摸事件
+  canvas.addEventListener('touchstart', handleTouchStart, false);
+  canvas.addEventListener('touchmove', handleTouchMove, false);
+  canvas.addEventListener('touchend', handleTouchEnd, false);
+
+  // 防止触摸时的默认行为（如页面滚动）
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+
   // 按钮事件
   document.getElementById('start-btn').addEventListener('click', () => {
     // 在用户交互后初始化音频上下文（解决浏览器自动播放策略）
@@ -484,6 +554,31 @@ function bindEventListeners() {
   });
   document.getElementById('resume-btn').addEventListener('click', resumeGame);
   document.getElementById('restart-btn').addEventListener('click', restartGame);
+}
+
+// 触摸开始事件
+function handleTouchStart(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  isTouching = true;
+}
+
+// 触摸移动事件
+function handleTouchMove(e) {
+  e.preventDefault();
+  if (isTouching) {
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }
+}
+
+// 触摸结束事件
+function handleTouchEnd(e) {
+  e.preventDefault();
+  isTouching = false;
 }
 
 // 开始游戏
