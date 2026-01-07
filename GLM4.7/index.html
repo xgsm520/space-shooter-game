@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太空飞机大战</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="score">分数: <span id="score">0</span></div>
+            <div class="lives">生命值: <span id="lives">100</span></div>
+            <div class="weapon">武器等级: <span id="weapon-level">1</span></div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-controls">
+            <button id="startBtn">开始游戏</button>
+            <button id="pauseBtn" disabled>暂停</button>
+            <button id="resumeBtn" disabled style="display: none;">继续</button>
+            <button id="restartBtn" style="display: none;">重新开始</button>
+        </div>
+        <div class="game-over" id="gameOver" style="display: none;">
+            <h2>游戏结束</h2>
+            <p>最终得分: <span id="finalScore">0</span></p>
+            <button id="gameOverRestartBtn">重新开始</button>
+        </div>
+        <div class="instructions">
+            <h3>操作说明</h3>
+            <p>PC端: 使用W/A/S/D键控制飞机移动</p>
+            <p>移动端: 触摸屏幕拖拽控制飞机移动</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
