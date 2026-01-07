@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>太空飞机大战</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="hud">
+  <div class="stats">
+    <span>生命值: <span id="health">100</span></span>
+    <span>分数: <span id="score">0</span></span>
+    <span>武器等级: <span id="weapon">1</span></span>
+  </div>
+  <div class="controls">
+    <button id="startBtn">开始游戏</button>
+    <button id="pauseBtn" disabled>暂停</button>
+    <button id="resumeBtn" disabled>继续</button>
+    <button id="restartBtn" disabled>重新开始</button>
+  </div>
+</div>
+<canvas id="gameCanvas"></canvas>
+<div id="touchTarget" class="touch-target"></div>
+<script src="script.js" defer></script>
+</body>
+</html>
