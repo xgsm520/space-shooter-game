@@ -529,6 +529,12 @@ function bindEventListeners() {
   canvas.addEventListener('touchmove', handleTouchMove, false);
   canvas.addEventListener('touchend', handleTouchEnd, false);
 
+  // 鼠标事件（用于PC端模拟摇杆）
+  canvas.addEventListener('mousedown', handleMouseDown, false);
+  canvas.addEventListener('mousemove', handleMouseMove, false);
+  canvas.addEventListener('mouseup', handleMouseUp, false);
+  canvas.addEventListener('mouseleave', handleMouseUp, false); // 鼠标离开画布时也视为释放
+
   // 防止触摸时的默认行为（如页面滚动）
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
@@ -596,6 +602,53 @@ function handleTouchMove(e) {
 // 触摸结束事件
 function handleTouchEnd(e) {
   e.preventDefault();
+  virtualJoystick.active = false;
+}
+
+// 鼠标按下事件
+function handleMouseDown(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  // 检查鼠标点击是否在左半边屏幕（控制区域）
+  if (mouseX < canvas.width / 2) {
+    // 初始化虚拟摇杆
+    virtualJoystick.active = true;
+    virtualJoystick.baseX = mouseX;
+    virtualJoystick.baseY = mouseY;
+    virtualJoystick.stickX = mouseX;
+    virtualJoystick.stickY = mouseY;
+  }
+}
+
+// 鼠标移动事件
+function handleMouseMove(e) {
+  if (virtualJoystick.active) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // 计算摇杆偏移
+    const dx = mouseX - virtualJoystick.baseX;
+    const dy = mouseY - virtualJoystick.baseY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= virtualJoystick.radius) {
+      // 摇杆在范围内，直接设置位置
+      virtualJoystick.stickX = mouseX;
+      virtualJoystick.stickY = mouseY;
+    } else {
+      // 摇杆超出范围，限制在范围内
+      const angle = Math.atan2(dy, dx);
+      virtualJoystick.stickX = virtualJoystick.baseX + Math.cos(angle) * virtualJoystick.radius;
+      virtualJoystick.stickY = virtualJoystick.baseY + Math.sin(angle) * virtualJoystick.radius;
+    }
+  }
+}
+
+// 鼠标释放事件
+function handleMouseUp(e) {
   virtualJoystick.active = false;
 }
 
