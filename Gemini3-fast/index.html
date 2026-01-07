@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>太空飞机大战 - AI版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="ui-layer">
+            <div class="stats">
+                <div id="hp-bar-container">HP: <div id="hp-bar">
+                        <div id="hp-fill"></div>
+                    </div>
+                </div>
+                <div id="score-display">分数: 0</div>
+                <div id="weapon-display">武器等级: 1</div>
+            </div>
+
+            <div id="start-screen" class="overlay">
+                <h1>太空飞机大战</h1>
+                <p>PC端: WASD 移动 | 移动端: 触摸拖拽</p>
+                <button id="start-btn">开始游戏</button>
+            </div>
+
+            <div id="game-over-screen" class="overlay hidden">
+                <h1>游戏结束</h1>
+                <p id="final-score">最终分数: 0</p>
+                <button id="restart-btn">重新开始</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
